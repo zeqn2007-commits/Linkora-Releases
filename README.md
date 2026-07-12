@@ -1,2 +1,8 @@
-# Linkora-Releases
-Signed Android releases and update metadata for Linkora
+# Linkora Releases
+
+Публичное хранилище подписанных Android APK и страницы возврата после смены пароля.
+Исходный код приложения и release-ключ находятся в приватном репозитории и сюда не
+публикуются.
+
+Приложение проверяет последнюю версию через GitHub Releases, временно загружает APK
+в системный кэш и перед установкой сверяет пакет, versionCode и Android-подпись.

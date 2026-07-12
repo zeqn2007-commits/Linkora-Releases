@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Linkora — смена пароля</title>
+  <style>
+    body { margin: 0; background: #101116; color: #f4f4f5; font: 16px system-ui; display: grid; min-height: 100vh; place-items: center; }
+    main { max-width: 420px; padding: 28px; text-align: center; }
+    a { display: inline-block; margin-top: 18px; padding: 13px 18px; border-radius: 12px; background: #9db9ff; color: #14244e; text-decoration: none; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Открываем Linkora</h1>
+    <p>В приложении появится окно для нового пароля.</p>
+    <a id="open" href="linkora://reset-password">Открыть Linkora</a>
+  </main>
+  <script>
+    const input = new URLSearchParams(location.search);
+    const output = new URLSearchParams();
+    for (const name of ["token", "error"]) {
+      const value = input.get(name);
+      if (value) output.set(name, value);
+    }
+    const target = `linkora://reset-password?${output.toString()}`;
+    document.getElementById("open").href = target;
+    location.replace(target);
+  </script>
+</body>
+</html>
