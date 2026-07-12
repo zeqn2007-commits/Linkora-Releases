@@ -6,15 +6,24 @@
   <title>Linkora — смена пароля</title>
   <style>
     body { margin: 0; background: #101116; color: #f4f4f5; font: 16px system-ui; display: grid; min-height: 100vh; place-items: center; }
-    main { max-width: 420px; padding: 28px; text-align: center; }
-    a { display: inline-block; margin-top: 18px; padding: 13px 18px; border-radius: 12px; background: #9db9ff; color: #14244e; text-decoration: none; font-weight: 700; }
+    main { width: min(420px, calc(100% - 48px)); padding: 28px 0; text-align: center; }
+    .card { padding: 28px; border: 1px solid #32343d; border-radius: 22px; background: #1b1c22; }
+    a { display: block; margin-top: 14px; padding: 13px 18px; border-radius: 12px; background: #9db9ff; color: #14244e; text-decoration: none; font-weight: 700; }
+    a.secondary { background: transparent; color: #b9caff; border: 1px solid #545968; }
+    p { color: #b7b8c0; line-height: 1.5; }
+    #status { min-height: 24px; color: #d4d8e5; }
   </style>
 </head>
 <body>
   <main>
-    <h1>Открываем Linkora</h1>
-    <p>В приложении появится окно для нового пароля.</p>
-    <a id="open" href="linkora://reset-password">Открыть Linkora</a>
+    <div class="card">
+      <h1>Смена пароля Linkora</h1>
+      <p id="description">Нажмите кнопку — в приложении откроется защищённое окно для нового пароля.</p>
+      <a id="open" href="linkora://reset-password">Открыть Linkora</a>
+      <a id="fallback" class="secondary" href="linkora://reset-password">Попробовать другой способ</a>
+      <p id="status" aria-live="polite"></p>
+      <a class="secondary" href="https://github.com/zeqn2007-commits/Linkora-Releases/releases/latest">Установить последнюю Linkora</a>
+    </div>
   </main>
   <script>
     const input = new URLSearchParams(location.search);
@@ -23,9 +32,28 @@
       const value = input.get(name);
       if (value) output.set(name, value);
     }
-    const target = `linkora://reset-password?${output.toString()}`;
-    document.getElementById("open").href = target;
-    location.replace(target);
+    const query = output.toString();
+    const target = `linkora://reset-password${query ? `?${query}` : ""}`;
+    const intentTarget = `intent://reset-password${query ? `?${query}` : ""}#Intent;scheme=linkora;package=ru.linkora.app;end`;
+    const open = document.getElementById("open");
+    const fallback = document.getElementById("fallback");
+    const status = document.getElementById("status");
+    const error = input.get("error");
+    const token = input.get("token");
+
+    if (error || !token) {
+      document.getElementById("description").textContent = "Ссылка недействительна или уже истекла. Вернитесь в Linkora и запросите новое письмо.";
+      open.hidden = true;
+      fallback.hidden = true;
+    } else {
+      open.href = /Android/i.test(navigator.userAgent) ? intentTarget : target;
+      fallback.href = target;
+      for (const button of [open, fallback]) {
+        button.addEventListener("click", () => {
+          status.textContent = "Открываем приложение… Если ничего не произошло, установите последнюю версию Linkora и нажмите ещё раз.";
+        });
+      }
+    }
   </script>
 </body>
 </html>
